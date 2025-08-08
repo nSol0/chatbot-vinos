@@ -5,11 +5,12 @@ import PyPDF2
 import io
 
 # === CONFIGURACIÓN DE API (OpenRouter) ===
-OPENROUTER_API_KEY =  st.sidebar.text_input(
+OPENROUTER_API_KEY = st.secrets.get("OPENROUTER_API_KEY") or st.sidebar.text_input(
     "🔑 Ingresa tu API Key de OpenRouter", 
     type="password",
     help="Puedes obtener una API Key gratuita en openrouter.ai"
 )
+
 
 HEADERS = {
     "Authorization": f"Bearer {OPENROUTER_API_KEY}",
