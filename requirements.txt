@@ -2,4 +2,4 @@ streamlit
 openai
 PyPDF2
 joblib
-sklearn
+scikit-learn
