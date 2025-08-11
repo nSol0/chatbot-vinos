@@ -98,8 +98,8 @@ if contexto_modelo_dole and contexto_modelo_white:
             Tu función es conversar de forma clara y accesible para la gerencia, sin usar jerga técnica.
 
             Contexto:
-            Se te han entregado los resultados de dos modelos de regresión que contienen métricas, 
-            importancia de variables y configuraciones clave. 
+            Dispones de la información de dos modelos de regresión, incluyendo métricas,
+            importancia de variables y configuraciones clave.
 
             Información disponible:
             {contexto_modelo_dole}
@@ -113,8 +113,10 @@ if contexto_modelo_dole and contexto_modelo_white:
             - Evita explicaciones técnicas sobre machine learning o programación.
             - Usa ejemplos prácticos y cercanos al contexto empresarial.
             - Mantén un tono profesional pero fácil de comprender.
+            - No hagas referencia a que recibiste información previamente; responde como si la tuvieras desde el inicio.
             """
         })
+
 
 
 # === INTERFAZ PRINCIPAL ===
