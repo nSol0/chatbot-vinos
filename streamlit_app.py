@@ -63,8 +63,8 @@ def ask_openrouter(messages):
 
 # === CONFIGURACIÓN DE PÁGINA ===
 st.set_page_config(
-    page_title="Analista de Modelos de Regresión",
-    page_icon="📈",
+    page_title="Wine Advisor Bot",
+    page_icon="🍷",
     layout="wide"
 )
 
