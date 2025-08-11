@@ -120,7 +120,7 @@ if contexto_modelo_dole and contexto_modelo_white:
 
 
 # === INTERFAZ PRINCIPAL ===
-st.title("📈 Analista de Modelos de Regresión")
+st.title("🍷 Wine Advisor Bot")
 st.caption("Haz preguntas sobre los modelos cargados")
 
 # Mostrar historial
