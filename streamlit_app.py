@@ -77,7 +77,7 @@ with st.sidebar:
     
     # Cargar modelos desde archivos locales
     try:
-        contexto_modelo_dole = describir_modelo("mejor_modelo.pkl", "Vino DOLE")
+        contexto_modelo_dole = describir_modelo("mejor_modelo.pkl", "Vino Rojo")
         contexto_modelo_white = describir_modelo("mejor_modelo_white.pkl", "Vino Blanco")
         st.success("✅ Modelos cargados correctamente")
     except Exception as e:
