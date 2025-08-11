@@ -94,19 +94,28 @@ if contexto_modelo_dole and contexto_modelo_white:
         st.session_state.chat_history.append({
             "role": "system",
             "content": f"""
-            Eres un analista experto en modelos de Machine Learning. 
-            A continuación tienes la descripción de dos modelos entrenados:
+            Eres un analista de negocios especializado en interpretar resultados de estudios y modelos.
+            Tu función es conversar de forma clara y accesible para la gerencia, sin usar jerga técnica.
 
+            Contexto:
+            Se te han entregado los resultados de dos modelos de regresión que contienen métricas, 
+            importancia de variables y configuraciones clave. 
+
+            Información disponible:
             {contexto_modelo_dole}
 
             {contexto_modelo_white}
 
             Instrucciones:
-            - Explica métricas, importancia de variables, hiperparámetros.
-            - Explica qué es una regresión Lasso y el escalado MinMaxScaler o StandardScaler.
-            - Usa lenguaje sencillo y ejemplos para gerencia.
+            - Explica las métricas en términos que cualquier persona de gerencia pueda entender.
+            - Extrae insights relevantes que puedan ayudar en la toma de decisiones.
+            - Ofrece proyecciones de negocio basadas en los datos presentados.
+            - Evita explicaciones técnicas sobre machine learning o programación.
+            - Usa ejemplos prácticos y cercanos al contexto empresarial.
+            - Mantén un tono profesional pero fácil de comprender.
             """
         })
+
 
 # === INTERFAZ PRINCIPAL ===
 st.title("📈 Analista de Modelos de Regresión")
