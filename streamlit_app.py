@@ -1,8 +1,7 @@
 import streamlit as st
 import requests
-from datetime import datetime
-import PyPDF2
-import io
+import joblib
+import numpy as np
 
 # === CONFIGURACIÓN DE API (OpenRouter) ===
 OPENROUTER_API_KEY = st.secrets.get("OPENROUTER_API_KEY") or st.sidebar.text_input(
@@ -11,29 +10,45 @@ OPENROUTER_API_KEY = st.secrets.get("OPENROUTER_API_KEY") or st.sidebar.text_inp
     help="Puedes obtener una API Key gratuita en openrouter.ai"
 )
 
-
 HEADERS = {
     "Authorization": f"Bearer {OPENROUTER_API_KEY}",
     "HTTP-Referer": "https://tuproyecto.com",
-    "X-Title": "chatbot-explicador"
+    "X-Title": "chatbot-modelos"
 }
 
 # === MODELOS DISPONIBLES ===
 model_options = {
-    "Qwen3": "qwen/qwen3-235b-a22b-07-25:free",
+    "Qwen3": "qwen/qwen3-coder:free",
     "DeepSeek R1": "deepseek/deepseek-r1-0528:free",
     "Gemini 2.0": "google/gemini-2.0-flash-exp:free",
 }
 
-# === FUNCIÓN PARA LEER PDF ===
-def leer_pdf(file):
-    pdf_reader = PyPDF2.PdfReader(file)
-    texto = ""
-    for page in pdf_reader.pages:
-        texto += page.extract_text() + "\n"
-    return texto
+# === FUNCIONES AUXILIARES ===
+def describir_modelo(path_modelo, nombre_modelo):
+    modelo = joblib.load(path_modelo)
+    
+    # Asumimos pipeline con scaler y modelo
+    scaler = modelo.named_steps.get("scaler", None)
+    modelo_reg = [v for k, v in modelo.named_steps.items() if k != "scaler"][0]
+    
+    # Extraer hiperparámetros
+    hiperparams = modelo_reg.get_params()
+    
+    # Coeficientes
+    if hasattr(modelo_reg, "coef_"):
+        importancias = dict(zip(modelo.feature_names_in_, modelo_reg.coef_))
+    else:
+        importancias = {}
+    
+    descripcion = f"""
+    Modelo: {nombre_modelo}
+    Tipo: {modelo_reg.__class__.__name__}
+    Scaler: {type(scaler).__name__ if scaler else 'Ninguno'}
+    Hiperparámetros: {hiperparams}
+    Importancia de variables (coeficientes): {importancias}
+    """
+    return descripcion
 
-# === FUNCIÓN PARA CONSULTAR OPENROUTER ===
 def ask_openrouter(messages):
     url = "https://openrouter.ai/api/v1/chat/completions"
     payload = {
@@ -48,8 +63,8 @@ def ask_openrouter(messages):
 
 # === CONFIGURACIÓN DE PÁGINA ===
 st.set_page_config(
-    page_title="Analista de Paper - Visión de Negocio",
-    page_icon="📊",
+    page_title="Analista de Modelos de Regresión",
+    page_icon="📈",
     layout="wide"
 )
 
@@ -57,50 +72,45 @@ st.set_page_config(
 with st.sidebar:
     st.title("⚙️ Configuración")
     
-    # Selección de modelo
     MODEL = st.selectbox("🧠 Modelo AI", list(model_options.keys()), index=0)
     MODEL = model_options[MODEL]
     
-    # Subir PDF
-    uploaded_pdf = st.file_uploader("📄 Sube el paper en PDF", type=["pdf"])
-    
-    # Botón para cargar contexto
-    if uploaded_pdf:
-        pdf_text = leer_pdf(uploaded_pdf)
-        st.success("✅ PDF cargado y listo para usar")
-    else:
-        pdf_text = None
-        st.warning("⚠️ Sube un PDF para iniciar el análisis")
+    # Cargar modelos desde archivos locales
+    try:
+        contexto_modelo_dole = describir_modelo("mejor_modelo.pkl", "Vino DOLE")
+        contexto_modelo_white = describir_modelo("mejor_modelo_white.pkl", "Vino Blanco")
+        st.success("✅ Modelos cargados correctamente")
+    except Exception as e:
+        contexto_modelo_dole = ""
+        contexto_modelo_white = ""
+        st.error(f"❌ Error al cargar modelos: {e}")
 
 # === INICIALIZACIÓN DEL CHAT ===
 if 'chat_history' not in st.session_state:
     st.session_state.chat_history = []
 
-if pdf_text:
+if contexto_modelo_dole and contexto_modelo_white:
     if not st.session_state.chat_history:
-        # Contexto inicial
         st.session_state.chat_history.append({
             "role": "system",
             "content": f"""
-            Eres un analista experto en negocios. Tu tarea es analizar el siguiente documento académico y responder
-            exclusivamente sobre:
-            - Métricas clave encontradas en el estudio
-            - Insights relevantes para la toma de decisiones
-            - Proyecciones de negocio basadas en los datos
+            Eres un analista experto en modelos de Machine Learning. 
+            A continuación tienes la descripción de dos modelos entrenados:
 
-            Lenguaje:
-            - Explica todo en palabras simples
-            - Evita jerga técnica
-            - Usa ejemplos fáciles de entender para gerencia
+            {contexto_modelo_dole}
 
-            Documento base:
-            {pdf_text}
+            {contexto_modelo_white}
+
+            Instrucciones:
+            - Explica métricas, importancia de variables, hiperparámetros.
+            - Explica qué es una regresión Lasso y el escalado MinMaxScaler o StandardScaler.
+            - Usa lenguaje sencillo y ejemplos para gerencia.
             """
         })
 
 # === INTERFAZ PRINCIPAL ===
-st.title("📊 Analista de Paper para Gerencia")
-st.caption("Sube un paper y haz preguntas sobre métricas, insights y proyecciones de negocio")
+st.title("📈 Analista de Modelos de Regresión")
+st.caption("Haz preguntas sobre los modelos cargados")
 
 # Mostrar historial
 for msg in st.session_state.chat_history:
@@ -110,14 +120,12 @@ for msg in st.session_state.chat_history:
         st.markdown(msg["content"])
 
 # Input de chat
-if OPENROUTER_API_KEY and pdf_text:
-    if prompt := st.chat_input("✍️ Pregunta sobre métricas, insights o proyecciones..."):
+if OPENROUTER_API_KEY and contexto_modelo_dole and contexto_modelo_white:
+    if prompt := st.chat_input("✍️ Pregunta sobre los modelos..."):
         st.session_state.chat_history.append({"role": "user", "content": prompt})
-        with st.spinner("Analizando el documento..."):
+        with st.spinner("Analizando..."):
             respuesta = ask_openrouter(st.session_state.chat_history)
         st.session_state.chat_history.append({"role": "assistant", "content": respuesta})
         st.rerun()
-elif not pdf_text:
-    st.info("📄 Por favor sube primero un PDF para comenzar.")
 else:
-    st.warning("⚠️ Ingresa tu API Key para comenzar.")
+    st.info("📄 No se han cargado los modelos o falta API Key.")
