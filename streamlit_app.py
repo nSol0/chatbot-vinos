@@ -121,7 +121,8 @@ if contexto_modelo_dole and contexto_modelo_white:
 
 # === INTERFAZ PRINCIPAL ===
 st.title("🍷 Wine Advisor Bot")
-st.caption("Haz preguntas sobre los modelos cargados")
+st.caption("Haz preguntas sobre métricas, insights y proyecciones 
+de negocio.")
 
 # Mostrar historial
 for msg in st.session_state.chat_history:
