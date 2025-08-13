@@ -102,9 +102,9 @@ if contexto_modelo_dole and contexto_modelo_white:
             importancia de variables y configuraciones clave.
 
             Información disponible:
-            {contexto_modelo_dole}
+            Modelo Vino tinto:{contexto_modelo_dole}
 
-            {contexto_modelo_white}
+            Modelo Vino Blanco:{contexto_modelo_white}
 
             Instrucciones:
             - Explica las métricas en términos que cualquier persona de gerencia pueda entender.
